@@ -142,7 +142,6 @@ a {
 .page {
   width: var(--page-width);
   margin-inline: auto;
-  margin-block: var(--section-spacing);
 }
 
 .main-content {
@@ -155,6 +154,9 @@ a {
 }
 
 @media screen and (min-width: 480px) {
+  .page {
+    margin-block: var(--section-spacing);
+  }
   .mobile {
     display: none;
   }

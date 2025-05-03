@@ -14,4 +14,5 @@ export interface ImageConfig {
   url: string;
   aspectRatio?: AspectRatio;
   objectPosition?: ObjectPosition;
+  className?: string
 }

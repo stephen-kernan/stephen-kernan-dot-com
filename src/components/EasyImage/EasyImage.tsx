@@ -1,14 +1,16 @@
-import { ImageConfig } from "@/types/ImageConfig";
+import { AspectRatio, ImageConfig } from "@/types/ImageConfig";
 import NextImage from "next/image";
 import { FC } from "react";
 
 export const EasyImage: FC<ImageConfig> = ({
   url,
   objectPosition,
-  aspectRatio,
+  aspectRatio = AspectRatio.HORIZONTAL,
+  className,
 }) => {
   return (
     <div
+      className={className}
       style={{
         maxWidth: "100%",
         overflow: "hidden",
