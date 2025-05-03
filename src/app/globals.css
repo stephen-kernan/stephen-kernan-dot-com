@@ -161,6 +161,7 @@ a {
   .split-page {
     display: grid;
     grid-template-columns: 2fr 1fr;
+    gap: var(--section-spacing);
   }
   .side-image-gallery {
     display: flex;
