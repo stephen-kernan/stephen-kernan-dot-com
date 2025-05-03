@@ -45,7 +45,7 @@ export const BlogPostPreview: FC<ContentMetadata> = ({
             </h3>
           </Link>
           <p
-            className={styles.publishedDate}
+            className={`muted-text ${styles.publishedDate}`}
             style={{ viewTransitionName: `date-${slugifyTitle(title)}` }}
           >
             {formattedDate}

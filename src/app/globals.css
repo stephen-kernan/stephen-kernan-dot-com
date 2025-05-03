@@ -92,6 +92,16 @@ code {
 pre {
   background-color: var(--background-dim);
   padding: 1rem 1.5rem;
+  overflow-x: auto;
+
+  code {
+    display: flex;
+    flex-direction: column;
+
+    /* I do this because otherwise the code block takes up 
+    as much space as possible, running off the page */
+    width: 0;
+  }
 }
 
 html,
@@ -138,7 +148,10 @@ a {
 .main-content {
   display: flex;
   flex-flow: column;
-  gap: var(--section-spacing);
+
+  &:not(.blog-post) {
+    gap: var(--section-spacing);
+  }
 }
 
 @media screen and (min-width: 480px) {
@@ -174,18 +187,6 @@ a {
 
 .byline {
   margin-bottom: calc(2 * var(--intersection-spacing));
-}
-
-.blog-post {
-  display: grid;
-  width: var(--page-width);
-}
-
-@media screen and (min-width: 768px) {
-  .blog-post {
-    grid-template-columns: 2fr 1fr;
-    width: 100%;
-  }
 }
 
 h1,

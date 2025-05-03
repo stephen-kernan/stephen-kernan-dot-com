@@ -6,8 +6,8 @@ export default async function BlogLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="split-page blog-post">
-      <div>{children}</div>
+    <div className="split-page">
+      <div className="blog-post main-content">{children}</div>
     </div>
   );
 }
