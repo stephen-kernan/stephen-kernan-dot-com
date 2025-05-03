@@ -33,11 +33,9 @@ export const getIP = async (): Promise<string> => {
   const forwardedFor = pageHeaders.get("x-forwarded-for");
 
   if (forwardedFor) {
-    console.log("FORWARDED FOR => ", forwardedFor);
     return forwardedFor.split(",")[0] ?? fallback;
   }
 
-  console.log("REAL IP FOR => ", forwardedFor);
   return pageHeaders.get("x-real-ip") ?? fallback;
 };
 
@@ -62,9 +60,6 @@ export const getSessionInfo = async (): Promise<SessionData> => {
 
   const { utm_source, utm_medium, utm_campaign, utm_content, utm_term } =
     utmData;
-
-  console.log("IP => ", ip);
-  console.log("CURRENT PATH => ", currentPath);
 
   return {
     sessionId: sessionId as SessionId,

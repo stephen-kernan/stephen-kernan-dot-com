@@ -22,7 +22,6 @@ export const sendEvent = async (
       distinct_id: sessionId,
       environment: ENVIRONMENT,
       path: currentPath,
-      currentPath: currentPath,
       ...sessionInfo,
       ...properties,
     },
