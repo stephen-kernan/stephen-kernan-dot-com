@@ -8,7 +8,6 @@ export async function middleware(req: NextRequest) {
   // Add the current path and referrer so that the Analytics helpers can pull it.
   const pathname = req.nextUrl.pathname ?? req.url.split("/")[3];
   requestHeaders.set("x-current-path", pathname);
-  console.log("CURRENT PATH => ", pathname);
   requestHeaders.set("x-referred-by", req.referrer || "/");
 
   // Add UTM data to the request headers

@@ -64,6 +64,7 @@ export const getSessionInfo = async (): Promise<SessionData> => {
     utmData;
 
   console.log("IP => ", ip);
+  console.log("CURRENT PATH => ", currentPath);
 
   return {
     sessionId: sessionId as SessionId,
