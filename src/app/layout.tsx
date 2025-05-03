@@ -5,6 +5,8 @@ import { NavBar } from "@/components/molecules/NavBar/NavBar";
 import { unstable_ViewTransition as ViewTransition } from "react";
 import { cookies } from "next/headers";
 import { Theme } from "@/types/Theme";
+import { sendEvent } from "@/events/events";
+import { EventName } from "@/events/types";
 
 const gloock = Gloock({
   variable: "--font-gloock",
@@ -33,6 +35,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await sendEvent(EventName.PageViewEvent, {});
   const cookieStore = await cookies();
   const theme = cookieStore.get("theme")?.value ?? Theme.DARK;
 

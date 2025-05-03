@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
     viewTransition: true,
     mdxRs: true,
   },
+  redirects: async () => [
+    {
+      source: "/blog/brag-documents",
+      destination: "/blog/how-to-use-a-brag-document",
+      permanent: true,
+    },
+    {
+      source: "/blog/prop-constructor-pattern",
+      destination: "/blog/default-override-pattern",
+      permanent: true,
+    },
+  ],
 };
 
 export default withMDX(nextConfig);
