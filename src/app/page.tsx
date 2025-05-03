@@ -1,4 +1,3 @@
-import { AspectRatio, EasyImage } from "./about/page";
 import styles from "./page.module.css";
 import { BlogPostList } from "@/components/molecules/BlogPostList/BlogPostList";
 

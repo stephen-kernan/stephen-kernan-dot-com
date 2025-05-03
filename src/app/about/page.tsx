@@ -1,29 +1,6 @@
-import NextImage from "next/image";
-import { FC } from "react";
-
-enum ObjectPosition {
-  TOP = "top",
-  CENTER = "center",
-  BOTTOM = "bottom",
-}
-
-export enum AspectRatio {
-  VERTICAL = 0.75,
-  SQUARE = 1,
-  HORIZONTAL = 1.25,
-}
-
-interface ImageConfig {
-  url: string;
-  aspectRatio?: AspectRatio;
-  objectPosition?: ObjectPosition;
-}
-
-interface AboutPageSection {
-  image: ImageConfig;
-  title?: string;
-  text?: string[];
-}
+import { AboutPageSection } from "./types";
+import { AspectRatio, ObjectPosition } from "@/types/ImageConfig";
+import { EasyImage } from "@/components/EasyImage/EasyImage";
 
 const sections: AboutPageSection[] = [
   {
@@ -66,30 +43,6 @@ const sections: AboutPageSection[] = [
     text: ["Lamy Safari Pen", ""],
   },
 ];
-
-export const EasyImage: FC<ImageConfig> = ({
-  url,
-  objectPosition,
-  aspectRatio,
-}) => {
-  return (
-    <div
-      style={{
-        maxWidth: "100%",
-        overflow: "hidden",
-        position: "relative",
-        aspectRatio: aspectRatio,
-      }}
-    >
-      <NextImage
-        src={url}
-        style={{ objectFit: "cover", objectPosition: objectPosition }}
-        fill
-        alt="Me and my brother-in-law holding up Gamecube controllers"
-      />
-    </div>
-  );
-};
 
 export default function About() {
   return (
