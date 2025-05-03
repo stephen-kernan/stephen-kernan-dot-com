@@ -1,0 +1,254 @@
+:root {
+  color-scheme: light dark;
+
+  --section-spacing: 2rem;
+  --intersection-spacing: 1rem;
+
+  /* COLOR */
+  --playerOne: hsl(240, 100%, 38%);
+  --playerTwo: hsl(0, 64%, 42%);
+  --playerThree: hsl(53, 100%, 24%);
+  --playerFour: hsl(184, 57%, 24%);
+  --playerFive: #f0f8ff99;
+  --color-light: #fdfbf7;
+  --color-light-dim: hsl(47, 29%, 94%);
+  --color-dark: #0a0a0a;
+  --color-dark-dim: #1a1a1a;
+
+  --background: var(--color-light);
+  --foreground: var(--color-dark);
+  --foreground-dim: var(--color-dark);
+  --background-dim: var(--color-light-dim);
+
+  /* SIZE */
+  --page-width: 95%;
+
+  --sh-identifier: var(--foreground-dim);
+  --sh-keyword: var(--playerTwo);
+  --sh-string: var(--playerThree);
+  --sh-class: var(--playerOne);
+  --sh-property: var(--playerThree);
+  --sh-entity: var(--playerFour);
+  --sh-jsxliterals: var(--playerTwo);
+  --sh-sign: lightdark(var(--foreground-dim));
+  --sh-comment: #a19595;
+}
+
+[data-theme="dark"] {
+  --background: var(--color-dark);
+  --foreground: var(--color-light);
+  --foreground-dim: var(--color-light-dim);
+  --background-dim: var(--color-dark-dim);
+
+  --playerOne: hsl(216, 64%, 72%);
+  --playerTwo: hsl(0, 64%, 72%);
+  --playerThree: hsl(41, 87%, 72%);
+  --playerFour: hsl(184, 57%, 72%);
+
+  .navbar {
+    button:hover {
+      svg {
+        stroke: gold !important;
+      }
+    }
+  }
+}
+
+[data-theme="light"] {
+  code {
+    font-weight: 600;
+  }
+}
+code {
+  font-family: var(--font-jb-mono), monospace;
+}
+
+@media screen and (min-width: 480px) {
+  :root {
+    --section-spacing: 3rem;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --page-width: 90%;
+    --section-spacing: 4rem;
+  }
+}
+
+@media screen and (min-width: 1072px) {
+  :root {
+    --page-width: 75%;
+  }
+}
+
+/* Basically, after page width = 1080, we stop it from growing */
+@media screen and (min-width: 1440px) {
+  :root {
+    --page-width: 1080px;
+  }
+}
+
+pre {
+  background-color: var(--background-dim);
+  padding: 1rem 1.5rem;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100vw;
+  font-size: 1.1rem;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p,
+pre {
+  margin-bottom: var(--intersection-spacing);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.side-image-gallery {
+  display: none;
+}
+
+.page {
+  width: var(--page-width);
+  margin-inline: auto;
+  margin-block: var(--section-spacing);
+}
+
+.main-content {
+  display: flex;
+  flex-flow: column;
+  gap: var(--section-spacing);
+}
+
+@media screen and (min-width: 480px) {
+  .mobile {
+    display: none;
+  }
+  .split-page {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+  }
+  .side-image-gallery {
+    display: flex;
+    flex-flow: column;
+    gap: var(--intersection-spacing);
+  }
+  .side-content {
+    width: 100%;
+  }
+  .main-content {
+    max-width: 75vw;
+  }
+}
+
+@media screen and (min-width: 786px) {
+  .main-content {
+    max-width: 60vw;
+  }
+}
+
+.muted-text {
+  opacity: 0.6;
+}
+
+.byline {
+  margin-bottom: calc(2 * var(--intersection-spacing));
+}
+
+.blog-post {
+  display: grid;
+  width: var(--page-width);
+}
+
+@media screen and (min-width: 768px) {
+  .blog-post {
+    grid-template-columns: 2fr 1fr;
+    width: 100%;
+  }
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-gloock);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: calc(0.8 * var(--intersection-spacing));
+}
+
+h2 {
+  font-size: 1.75rem;
+  margin-block: var(--intersection-spacing);
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: calc(0.8 * var(--intersection-spacing));
+}
+
+ul,
+ol {
+  display: inline-block;
+  padding-left: calc(2.5 * var(--intersection-spacing));
+  margin-bottom: calc(1.25 * var(--intersection-spacing));
+}
+
+li {
+  margin-bottom: calc(0.1 * var(--intersection-spacing));
+}
+
+blockquote {
+  padding-inline: calc((2.5 * var(--intersection-spacing)) - 4px);
+  padding-top: calc(var(--intersection-spacing));
+  padding-bottom: calc(0.5 * var(--intersection-spacing));
+  margin-bottom: var(--intersection-spacing);
+
+  border-left: 4px solid var(--foreground);
+  background-color: var(--background-dim);
+}
+
+ul {
+  li {
+    list-style-type: disc;
+  }
+}
+
+*:has(+ h1),
+*:has(+ h2),
+*:has(+ h3) {
+  margin-bottom: calc(1.5 * var(--intersection-spacing));
+}
+
+@media screen and (min-width: 720px) {
+  .navBar {
+    margin-inline: auto;
+    width: 90%;
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}

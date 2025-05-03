@@ -1,0 +1,188 @@
+/* PrismJS 1.29.0
+https://prismjs.com/download.html#themes=prism-tomorrow&languages=markup+css+clike+javascript&plugins=normalize-whitespace+toolbar+copy-to-clipboard */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--bakugoLight);
+  background: 0 0;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  font-size: clamp(0.75rem, 2vw, 1.25rem);
+  padding-bottom: 1rem !important;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  border-radius: 10px;
+}
+pre[class*="language-"] {
+  padding: 0;
+  margin: 0 0;
+  margin-bottom: 2rem;
+  overflow: auto;
+}
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: #2d2d2d;
+}
+:not(pre) > code[class*="language-"] {
+  /* padding: 0.1em; */
+  border-radius: 0.3em;
+  white-space: normal;
+}
+
+.copy-to-clipboard-button {
+  color: var(--bakugoLight) !important;
+  background-color: var(--eraserHeadLight) !important;
+
+  font-family: "Sora", sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+
+  padding: 0.5rem 1rem !important;
+
+  border-radius: 5px !important;
+  cursor: pointer;
+}
+
+.token.attr-name {
+  color: var(--playerThree);
+}
+
+.token.script.language-javascript {
+  color: var(--playerFour);
+}
+.token.function.function-variable {
+  color: var(--bakugoLight);
+}
+
+.token.block-comment,
+.token.cdata,
+.token.comment,
+.token.doctype,
+.token.prolog {
+  color: #999;
+}
+.token.punctuation {
+  color: var(--bakugoLight);
+  filter: opacity(0.5);
+}
+.token.deleted,
+.token.namespace,
+.token.tag {
+  color: var(--playerTwo);
+}
+.token.function-name {
+  color: var(--playerTwo);
+}
+.token.function,
+.token.number {
+  color: var(--playerOne);
+}
+.token.class-name,
+.token.boolean {
+  color: var(--playerTwo);
+}
+.token.constant,
+.token.property,
+.token.symbol {
+  color: var(--playerThree);
+}
+.token.atrule,
+.token.builtin,
+.token.important,
+.token.keyword,
+.token.selector {
+  color: var(--playerOne);
+}
+.token.attr-value,
+.token.char,
+.token.regex,
+.token.string,
+.token.variable {
+  color: var(--playerFour);
+}
+.token.entity,
+.token.operator,
+.token.url {
+  color: var(--bakugoLight);
+}
+.token.parameter {
+  color: var(--playerFour);
+}
+.token.bold,
+.token.important {
+  font-weight: 700;
+}
+.token.italic {
+  font-style: italic;
+}
+.token.entity {
+  cursor: help;
+}
+.token.inserted {
+  color: var(--playerFour);
+}
+div.code-toolbar {
+  position: relative;
+}
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: 0.3em;
+  right: 0.2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: 0 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: #bbb;
+  font-size: 0.8em;
+  /* padding: 0 0.5em; */
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.2);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+  border-radius: 0.5em;
+}
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover {
+  color: inherit;
+  text-decoration: none;
+}

@@ -1,0 +1,19 @@
+.landingPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.heroText {
+  display: flex;
+  flex-flow: column;
+}
+
+@media screen and (min-width: 786px) {
+  .landingPage {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .mainContent {
+    max-width: 60vw;
+  }
+}

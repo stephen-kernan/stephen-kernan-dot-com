@@ -1,0 +1,317 @@
+import { Byline } from "@/components/atoms/Byline/Byline";
+import { ContentMetadata } from "@/types/ContentMetadata";
+
+export const metadata = {
+  title: "The default-override pattern for creating test data",
+  excerpt:
+    "Make your tests more readable while reducing boilerplate to help speed up the development cycle.",
+  date: "2025-04-20",
+  tags: ["testing"],
+  slug: "default-override-testing-pattern",
+};
+
+# The default-override pattern for creating test data
+
+<Byline {...metadata} />
+
+Imagine that you've built a simple `<Button />` component, like this:
+
+```jsx
+export const Button = ({ label, onClick, variant }) => {
+  return (
+    <button
+      data-testid="button"
+      className={`button-${variant}`}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+};
+```
+
+This `<Button />` component is pretty simple. It should render a `<button>` on the page which contains the text provided by the `label` prop, it appends the provided `variant` prop to the `className`, and it executes the `onClick` function when clicked. To make sure that your component works as intended, you go through and add a few simple unit tests.
+
+```javascript
+const onClickMock = jest.fn();
+
+describe("Button", () => {
+  describe("label", () => {
+    it("Renders with the correct label", () => {
+      render(<Button label="Test" onClick={onClickMock} variant="primary" />);
+
+      expect(screen.getByTestId("button")).toBeVisible();
+    });
+  });
+  describe("variant", () => {
+    it("Applies the button-{variant} class to the ", () => {
+      render(<Button label="Test" onClick={onClickMock} variant="primary" />);
+
+      expect(screen.getByTestId("button")).toBeVisible();
+    });
+  });
+  describe("onClick()", () => {
+    it("Calls onClick when clicked", () => {
+      render(<Button label="Test" onClick={onClickMock} variant="primary" />);
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+```
+
+There's nothing _wrong_ with these tests. In fact, I would say that the average test suite for a React component may even look like this.
+
+But, if you're like me, then there may be a little DRY alarm going off in your head 🚨
+
+Each of these tests manually renders the component, with each prop explicitly defined in every test. This is a problem for a few reasons:
+
+1. **It's dangerous to add new props** - Any prop that gets added to the component must be explicitly added to _every test_. That may not be a huge deal for this component, since there are only three tests, but some components can have as many as 50-100 unit tests.
+2. **It's a lot of typing** - This seems like a minor detail, but extra friction in the test-writing process can make it feel like a chore and will encourage poor tests (or worse, _no tests_! 👻)
+
+Imagine that your fantastic product manager reaches out and requests that a `disabled` field should be added to the `<Button />` so that no customer can press the button without being logged in. One quick change to the component and, voila 🪄, our button can be disabled:
+
+```jsx
+export const Button = ({ label, onClick, variant, disabled }) => {
+  return (
+    <button
+      data-testid="button-with-disable"
+      className={`button-${variant}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  );
+};
+```
+
+Now let's add some tests. If we follow the pattern of the tests above, we might do something like this:
+
+```javascript
+const onClickMock = jest.fn();
+
+describe("Button", () => {
+  //...other tests (each of which need a disabled field too)...
+
+  describe("onClick()", () => {
+    // existing test, which still has to be updated
+    it("if button is not disabled, calls onClick when clicked", () => {
+      render(
+        <Button
+          label="Test"
+          onClick={onClickMock}
+          variant="primary"
+          disabled={false}
+        />
+      );
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+    });
+
+    // new test, which is yet another explicit component render
+    it("if button is disabled, *does not* call onClick when clicked", () => {
+      render(
+        <Button
+          label="Test"
+          onClick={onClickMock}
+          variant="primary"
+          disabled={true}
+        />
+      );
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(0);
+    });
+  });
+});
+```
+
+Not only is there some extra typing involved, but every previous test must be updated to include a `disabled` field as well. To make matters worse, the test we just added will only add to the number of updates required for future props.
+
+Let's see if we can make these tests a bit more reusable!
+
+## The Common Solution: A Render Function
+
+Let's take a look at the most common solution I have seen to avoid duplication in test files - a `render` function. Here's how the render function would improve our original test cases:
+
+```javascript
+const onClickMock = jest.fn();
+
+const renderButton = () => {
+  render(<Button label="Test" onClick={onClickMock} variant="primary" />);
+};
+
+describe("Button", () => {
+  describe("label", () => {
+    it("Renders with the correct label", () => {
+      renderButton();
+
+      expect(screen.getByTestId("button")).toBeVisible();
+    });
+  });
+  describe("variant", () => {
+    it("Applies the button-{variant} class to the ", () => {
+      renderButton();
+
+      expect(screen.getByTestId("button").classList).toInclude("primary");
+    });
+  });
+  describe("onClick()", () => {
+    it("Calls onClick when clicked", () => {
+      renderButton();
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+```
+
+Rather than explicitly defining our component and it's props over and over, we've created a new function, `renderButton`, which handles all of that logic for us. The DRY alarm has relented and my brain is quiet once more. Peace at last 🧘
+
+But there's a catch. What happens if your tests needs different props?
+
+When adding tests for the `disabled` case, we want to test both when the button is disabled and when it _isn't_. However, our `renderButton` function doesn't accomodate that very well:
+
+```javascript
+const renderButton = () => {
+  render(
+    <Button
+      label="Test"
+      onClick={onClickMock}
+      variant="primary"
+      disabled={false}
+    />
+  );
+};
+
+describe("Button", () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  // ...other tests
+
+  describe("onClick()", () => {
+    // this test can use the render function
+    it("If !disabled, calls onClick when clicked", () => {
+      renderButton();
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+    });
+
+    // this test *must* render manually to enforce the disabled prop
+    it("If disabled, *does not call* onClick when clicked", () => {
+      render(
+        <Button
+          label="Test"
+          onClick={onClickMock}
+          variant="primary"
+          disabled={true}
+        />
+      );
+      fireEvent.click(screen.getByTestId("button"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(0);
+    });
+  });
+});
+```
+
+Notice that we have to make a _choice_ with the props in our `renderButton` function. In other words, we're locked in 🔒
+
+This is the biggest weakness with the reusable render function. The lack of flexibility means that any tests which require a variation from the standard props _still_ have to explicitly render the component and list its props. To make matters worse, we now have a mix of explicit and standard renderings to parse through any time we add props so we've even lost some of the benefits of being DRY in the first place.
+
+> 💡 Its possible to alleviate this (to some extent) by having separate render functions. In our case, we would have a `renderButton` and a `renderButtonDisabled`. However, I've found that this approach is very difficult to scale as the number of props increase or the logic inside of the component grows. Imagine a `renderSecondaryButtonDisabledNoLabel`. That's a nightmare 😱
+
+So what can we do?
+
+## A More Flexible Approach: The Prop Constructor Pattern
+
+We can use the Prop Constructor Pattern! This pattern takes advantage of the Javascript _spread operator_ (`{...obj}`) to build a render function which removes unnecessary repetition while also giving us the flexibility we need to customize any of our props on the fly.
+
+Here's our new-and-improved `renderButton` function 🎉:
+
+```javascript
+// establish a shared starting point with defaultProps
+const defaultProps = {
+  label: "Test",
+  onClick: onClickMock,
+  variant: "primary",
+  disabled: false,
+};
+
+// allow a custom props object as a parameter to your render function.
+const renderButton = (customProps = {}) => {
+  // the spread operator allows us to overwrite any variables we
+  // explicitly provide, while *keeping the default value* of any
+  // other props
+  const componentProps = { ...defaultProps, ...customProps };
+
+  // then, we unpack the combined props into our component
+  render(<Button {...componentProps} />);
+};
+```
+
+So let's walk through the changes.
+
+Notice that now we're taking in a `customProps` object. I've defaulted it to an empty object so that, even _without_ customProps, our render function will be able to pass in the default props correctly. We can then use the spread operator to _merge_ our `defaultProps` object with the `customProps` object. This means that any props we explicitly define in our `customProps` object _overwrite_ those props in the `defaultProps` object while leaving the other values intact. Here's a small example:
+
+```javascript
+const obj1 = { first: 100, second: 20, last: 5 };
+const obj2 = { third: 15, last: 2 };
+
+console.log({ ...obj1, ...obj2 });
+// { first: 100, second: 20, third: 15, last: 2}
+```
+
+Once we've merged the objects together, we can just pass those props into our component like this:
+
+```javascript
+render(<Button {...componentProps} />);
+```
+
+Now let's write some tests 👍
+
+```javascript
+describe("Button", () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  // ...other tests
+
+  describe("onClick()", () => {
+    it("If disabled is false, calls onClick when clicked", () => {
+      renderButton();
+      fireEvent.click(screen.getByTestId("button-with-disable"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+    });
+
+    // now this test can use the same function!
+    it("If disabled is true, *does not call* onClick when clicked", () => {
+      renderButton({ disabled: true });
+      fireEvent.click(screen.getByTestId("button-with-disable"));
+
+      expect(onClickMock).toHaveBeenCalledTimes(0);
+    });
+  });
+});
+```
+
+Look at that improvement with only a few extra lines of code in the `renderButton` function! Not only can the original test still use the `renderButton` function with its default props, but our new test can add its own props too 🙌
+
+To recap, here are some of the benefits of using the Prop Constructor Pattern:
+
+1. It avoids unnecessary duplication
+2. It provides flexibility to adjust props when needed
+3. Bonus: It's immediately clear which props are being manipulating in the test
+
+Full code for the `<Button />` component can be found [here](https://github.com/stephen-kernan/code-examples/blob/main/jest/propConstructorPattern/components/Button.js).
+
+Full code for the tests can be found [here](https://github.com/stephen-kernan/code-examples/blob/main/jest/propConstructorPattern/tests/Button.test.js).
