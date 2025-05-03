@@ -40,7 +40,9 @@ export async function middleware(req: NextRequest) {
   }
 
   const response = NextResponse.next({
-    headers: requestHeaders,
+    request: {
+      headers: requestHeaders,
+    },
   });
 
   // This step sets the cookies in the browser because
