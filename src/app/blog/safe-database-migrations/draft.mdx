@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "Safe database migrations",
+  date: "2025-05-05",
+  tags: ["database", "migrations", "orms", "breaking-changes"],
+  slug: "safe-database-migrations",
+};
+
+# How to safely migrate a database
+
+Wouldn't it be nice to make migrations that don't take down your production database?
+
+In this guide, we'll explore how to safely migrate a database using an ORM framework. My examples will use SQLAlchemy and PostgreSQL, but the concepts apply to any ORM framework and database.
+
+## The problem: How ORMs build queries
+
+To illustrate why database migrations can cause problems, it's helpful to understand how ORMs build queries.
+
+Let's imagine that you have a database with a table called `users` and you want to find a user by their email address. In SQL, you would write a query like this:
+
+```sql
+SELECT * FROM users WHERE email = "fake_email.com";
+```
+
+This query will return all rows from the `users` table where the `email` column matches the value "fake_email.com". Simple enough.
+
+Now, let's imagine that we have a SQLAlchemy* model called `User` that represents the `users` table in our database. In SQLAlchemy, you would write a query like this:
+
+```python
+user = session.execute(
+    select(User).where(User.email == "fake@email.com")
+).first()
+```
+
+We might expect that this query would be translated to the same SQL query as above, but it actually gets translated to a different query:
+
+```sql
+SELECT users.id, users.email, ... FROM users WHERE users.email = "fake@email.com";
+```
+
+Notice that rather than `SELECT *`, SQLAlchemy is selecting all of the columns explicitly. This is an extremely common pattern in ORMs. In fact, almost all ORMs follow the same pattern, which has some advantages. For example:
+
+- It prevents the ORM from accidentally selecting columns that our ORM-specific model isn't prepared to handle.
+- It allows the ORM to omit columns that we've chosen to defer.
+- It ensures that the order of the columns in the result set is consistent with the order of the columns in the model.
+
+## Adding a new, required column to an existing table
+
+For the most part, adding a new column to an existing table is a safe operation. However, adding a new column can become dangerous if our new field is a required field on an existing table into which our application is already writing data.
+
+### Why can this be a problem?
+
+ORMs create and enforce 

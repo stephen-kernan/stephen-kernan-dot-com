@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { Theme } from "@/types/Theme";
 import { sendEvent } from "@/events/events";
 import { EventName } from "@/events/types";
+import { MermaidInitializer } from "@/components/MermaidInitializer/MermaidInitializer";
 
 const gloock = Gloock({
   variable: "--font-gloock",
@@ -41,6 +42,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" data-theme={theme}>
+      <MermaidInitializer theme={theme as Theme} />
       <ViewTransition>
         <body
           className={`${gloock.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}

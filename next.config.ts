@@ -6,7 +6,7 @@ const withMDX = createMDX({
   /* config options here */
   // extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [["remark-gfm"], ["remark-html"]] as Pluggable[],
+    remarkPlugins: ["remark-gfm", "remark-html"] as Pluggable[],
     rehypePlugins: [["rehype-highlight"], ["rehype-stringify"]] as Pluggable[],
   },
 });

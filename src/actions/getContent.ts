@@ -22,7 +22,7 @@ function parseFrontmatter(fileContent: string) {
 
 function getMDXFiles(dir: string) {
   return fs.readdirSync(dir, { recursive: true }).filter((file) => {
-    return path.extname(file as string) === ".mdx";
+    return path.basename(file as string) === "page.mdx";
   });
 }
 

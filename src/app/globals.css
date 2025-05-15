@@ -118,6 +118,11 @@ body {
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  p,
+  li {
+    line-height: 1.5rem;
+  }
 }
 
 p,
@@ -221,7 +226,7 @@ ol {
 }
 
 li {
-  margin-bottom: calc(0.1 * var(--intersection-spacing));
+  margin-bottom: calc(0.5 * var(--intersection-spacing));
 }
 
 blockquote {
@@ -244,6 +249,28 @@ ul {
 *:has(+ h2),
 *:has(+ h3) {
   margin-bottom: calc(1.5 * var(--intersection-spacing));
+}
+
+foreignObject {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:has(.edgeLabel) {
+    background-color: transparent;
+
+    .edgeLabel,
+    .labelBkg {
+      background-color: transparent !important;
+    }
+
+    p {
+      margin-inline: auto !important;
+      max-width: max-content;
+      border-radius: 4px;
+      padding: 0 0.75rem;
+    }
+  }
 }
 
 @media screen and (min-width: 720px) {

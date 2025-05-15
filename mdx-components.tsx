@@ -19,7 +19,14 @@ const components: MDXComponents = {
     return <ul {...props}>{children}</ul>;
   },
   code: ({ children, ...props }: ComponentPropsWithoutRef<"code">) => {
-    const highlightedContent = highlight(children as string);
+    if (props.className?.includes("language-mermaid")) {
+      return (
+        <pre {...props} className="mermaid mermaid-pending">
+          {children}
+        </pre>
+      );
+    }
+    const highlightedContent = highlight(children as string, {});
     return (
       <code
         dangerouslySetInnerHTML={{ __html: highlightedContent.toString() }}

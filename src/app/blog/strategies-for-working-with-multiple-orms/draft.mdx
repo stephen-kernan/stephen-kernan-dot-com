@@ -1,0 +1,19 @@
+export const metadata = {
+  title: "Strategies for working with multiple ORMs",
+  date: "2025-05-05",
+  tags: ["orms", "databases", "breaking-changes"],
+  slug: "strategies-for-working-with-multiple-orms",
+};
+
+# Strategies for working with multiple ORMs
+
+## 1. Use a single ORM to manage migrations on a single database
+
+If you have multiple databases, then it may be reasonable to use a different ORM for each database. 
+
+## 2. Resist the urge to copy all fields from one ORM to another
+
+- It will be a huge waste of time to keep them in sync
+- Keeping them in sync is completely unnecessary
+- Keeping them in sync may actually cause bugs because removing a field will become significantly more risky
+

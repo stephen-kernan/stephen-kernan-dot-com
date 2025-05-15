@@ -30,6 +30,6 @@
     "src/app/blog/hello/page.mdx",
     "src/app/blog/driving-team-autonomy/page.mdx",
     "src/app/about/page.mdx"
-  ],
+, "src/app/blog/understanding-orms/draft.mdx", "src/app/blog/styling-mermaid-edge-labels/page.mdx"  ],
   "exclude": ["node_modules"]
 }
