@@ -2,6 +2,7 @@ import { ContentMetadata } from "@/types/ContentMetadata";
 import { BlogFilter, BlogOrder } from "@/types/BlogFilter";
 import fs from "fs";
 import path from "path";
+import { ContentType } from "@/types/ContentType";
 
 function parseFrontmatter(fileContent: string) {
   const frontmatterRegex = /metadata = {\s*([\s\S]*?)\s*}/;
@@ -20,7 +21,7 @@ function parseFrontmatter(fileContent: string) {
   }
 }
 
-function getMDXFiles(dir: string) {
+export function getMDXFiles(dir: string) {
   return fs.readdirSync(dir, { recursive: true }).filter((file) => {
     return path.basename(file as string) === "page.mdx";
   });
@@ -29,7 +30,10 @@ function getMDXFiles(dir: string) {
 const hrefFromFilepath = (filePath: string): string => {
   const pathSplit = filePath.split("app");
   if (pathSplit.length > 1) {
-    return pathSplit[1].replace("/page.mdx", "");
+    const path = pathSplit[1].replace("/page.mdx", "");
+    // Remove any sets of parentheses from the path'
+    const pathWithoutParentheses = path.replace(/\(.*?\)\//g, "");
+    return pathWithoutParentheses;
   }
   return "/";
 };
@@ -49,54 +53,64 @@ function getMDXData(dir: string): ContentMetadata[] {
   return mdxFiles.map((file) => readMDXFile(path.join(dir, file as string)));
 }
 
-export function getBlogPosts(
+const pathsMap: Record<ContentType, string> = {
+  [ContentType.Blog]: path.join(process.cwd(), "src", "app", "blog"),
+  [ContentType.BlogPersonal]: path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "blog",
+    "(personal)"
+  ),
+  [ContentType.BlogProfessional]: path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "blog",
+    "(professional)"
+  ),
+  [ContentType.Note]: path.join(process.cwd(), "src", "app", "notes"),
+  [ContentType.All]: "", // Left blank because 'All' is a combination of all paths
+};
+
+export const getPosts = (
+  contentTypes: ContentType[] = [ContentType.All],
   filterFunc: BlogFilter = (c) => c,
   orderFunc: BlogOrder = (m1, m2) => (m1.date > m2.date ? -1 : 1),
   limit: number = 0
-) {
-  const allItems = getMDXData(path.join(process.cwd(), "src", "app", "blog"))
-    .filter(filterFunc)
-    .sort(orderFunc);
-
-  if (limit) {
-    return allItems.slice(0, limit);
-  }
-
-  return allItems;
-}
-
-export function formatDate(date: string, includeRelative = false) {
-  const currentDate = new Date();
-  if (!date.includes("T")) {
-    date = `${date}T00:00:00`;
-  }
-  const targetDate = new Date(date);
-
-  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();
-  const monthsAgo = currentDate.getMonth() - targetDate.getMonth();
-  const daysAgo = currentDate.getDate() - targetDate.getDate();
-
-  let formattedDate = "";
-
-  if (yearsAgo > 0) {
-    formattedDate = `${yearsAgo}y ago`;
-  } else if (monthsAgo > 0) {
-    formattedDate = `${monthsAgo}mo ago`;
-  } else if (daysAgo > 0) {
-    formattedDate = `${daysAgo}d ago`;
-  } else {
-    formattedDate = "Today";
-  }
-
-  const fullDate = targetDate.toLocaleString("en-us", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
+): ContentMetadata[] => {
+  const paths: string[] = [];
+  contentTypes.forEach((type) => {
+    if (type === ContentType.All) {
+      Object.values(pathsMap).forEach((path) => {
+        if (path !== pathsMap[ContentType.All]) {
+          paths.push(path);
+        }
+      });
+    } else {
+      paths.push(pathsMap[type]);
+    }
   });
 
-  if (!includeRelative) {
-    return fullDate;
-  }
+  // Get all the items from the paths stitched together
+  // Don't order or limit yet to avoid losing data
+  const items: ContentMetadata[] = [];
+  paths.forEach((path) => {
+    const mdxData = getMDXData(path).filter(filterFunc);
+    items.push(...mdxData);
+  });
 
-  return `${fullDate} (${formattedDate})`;
-}
+  // Remove duplicates based on the slug. This is required because
+  // some categories have some overlap (e.g., all blog posts + personal blog posts)
+  const uniqueItems = new Map<string, ContentMetadata>();
+  items.forEach((item) => {
+    if (!uniqueItems.has(item.slug)) {
+      uniqueItems.set(item.slug, item);
+    }
+  });
+
+  // Sort the full list of items
+  const sortedItems = new Array(...uniqueItems.values()).sort(orderFunc);
+
+  return sortedItems.slice(0, limit === 0 ? sortedItems.length : limit);
+};

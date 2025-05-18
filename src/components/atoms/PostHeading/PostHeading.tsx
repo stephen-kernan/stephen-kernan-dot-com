@@ -4,6 +4,6 @@ interface BlogPostHeadingProps {
   children: ReactNode;
 }
 
-export const BlogPostHeading: FC<BlogPostHeadingProps> = ({ children }) => {
+export const PostHeading: FC<BlogPostHeadingProps> = ({ children }) => {
   return <h1 className="transition-heading">{children}</h1>;
 };

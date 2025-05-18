@@ -17,27 +17,33 @@ export const NavBar: FC<NavBarProps> = async ({ theme }) => {
       path: "/blog",
     },
     {
+      label: "notes",
+      path: "/notes",
+    },
+    {
       label: "about",
       path: "/about",
     },
   ];
 
   return (
-    <nav className={`${styles.navBar} navbar`}>
-      <div className={styles.navLogo}>
-        <Link href="/" className={styles.navHeader}>
-          stephen kernan
-        </Link>
-      </div>
-      <div className={styles.navOptions}>
-        <ul className={styles.navLinks}>
-          {links.map((link: LinkType) => (
-            <li style={{ listStyleType: "none" }} key={link.path}>
-              <a href={link.path}>{link.label}</a>
-            </li>
-          ))}
-        </ul>
-        <ThemeButton startingTheme={theme as Theme} />
+    <nav className={styles.navBarContainer}>
+      <div className={`${styles.navBar} navbar`}>
+        <div className={styles.navLogo}>
+          <Link href="/" className={styles.navHeader}>
+            stephen kernan
+          </Link>
+        </div>
+        <div className={styles.navOptions}>
+          <ul className={styles.navLinks}>
+            {links.map((link: LinkType) => (
+              <li style={{ listStyleType: "none" }} key={link.path}>
+                <a href={link.path}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+          <ThemeButton startingTheme={theme as Theme} />
+        </div>
       </div>
     </nav>
   );

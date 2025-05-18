@@ -1,17 +1,17 @@
 import ContentMetadata from "@/types/ContentMetadata";
 import { FC } from "react";
 
-import styles from "./BlogPostPreview.module.css";
+import styles from "./PostPreview.module.css";
 import { Button } from "../Button/Button";
 import { slugifyTitle } from "@/actions/slugifyTitle";
 import Link from "next/link";
 import { formatDate } from "@/actions/formatDate";
 
-interface BlogTagListProps {
+interface TagListProps {
   tags: string[];
 }
 
-export const BlogTagList: FC<BlogTagListProps> = ({ tags }) => {
+export const TagList: FC<TagListProps> = ({ tags }) => {
   return (
     <div className={styles.tagList}>
       {tags.map((tag) => (
@@ -23,7 +23,7 @@ export const BlogTagList: FC<BlogTagListProps> = ({ tags }) => {
   );
 };
 
-export const BlogPostPreview: FC<ContentMetadata> = ({
+export const PostPreview: FC<ContentMetadata> = ({
   title,
   date,
   url,

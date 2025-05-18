@@ -1,4 +1,5 @@
 import { slugifyTitle } from "@/actions/slugifyTitle";
+import { EasyImage } from "@/components/EasyImage/EasyImage";
 import { MDXComponents } from "mdx/types";
 import { ComponentPropsWithoutRef } from "react";
 import { highlight } from "sugar-high";
@@ -17,6 +18,9 @@ const components: MDXComponents = {
   },
   ul: ({ children, ...props }: ComponentPropsWithoutRef<"ul">) => {
     return <ul {...props}>{children}</ul>;
+  },
+  img: ({ ...props }: ComponentPropsWithoutRef<"img">) => {
+    return <EasyImage url={props.src as string} />;
   },
   code: ({ children, ...props }: ComponentPropsWithoutRef<"code">) => {
     if (props.className?.includes("language-mermaid")) {

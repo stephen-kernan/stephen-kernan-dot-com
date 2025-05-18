@@ -1,8 +1,10 @@
-export const formatDate = (date: string): string => {
+export const formatDate = (date: Date): string => {
   const datetime = new Date(date);
-  return datetime
-    .toLocaleDateString()
-    .split("/")
-    .map((piece: string) => piece.padStart(Math.max(2, piece.length), "0"))
-    .join("-");
+  const [day, month, year] = datetime
+    .toUTCString()
+    .split(" ")
+    .slice(1, 4)
+    .map((piece: string) => piece.padStart(Math.max(2, piece.length), "0"));
+
+  return `${month} ${day}, ${year}`;
 };

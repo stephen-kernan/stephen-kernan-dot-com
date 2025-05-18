@@ -1,5 +1,6 @@
+import { ContentType } from "@/types/ContentType";
 import styles from "./page.module.css";
-import { BlogPostList } from "@/components/molecules/BlogPostList/BlogPostList";
+import { PostList } from "@/components/molecules/PostList/PostList";
 
 export default async function Home() {
   return (
@@ -24,7 +25,11 @@ export default async function Home() {
           </p>
         </div>
         <div className={styles.recentPosts}>
-          <BlogPostList headingText="Recent posts" limit={3} />
+          <PostList
+            headingText="Recent posts"
+            limit={3}
+            contentTypes={[ContentType.Blog]}
+          />
         </div>
       </div>
     </div>

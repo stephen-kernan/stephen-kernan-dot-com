@@ -6,8 +6,7 @@ const withMDX = createMDX({
   /* config options here */
   // extension: /\.mdx?$/,
   options: {
-    remarkPlugins: ["remark-gfm", "remark-html"] as Pluggable[],
-    rehypePlugins: [["rehype-highlight"], ["rehype-stringify"]] as Pluggable[],
+    remarkPlugins: [["remark-gfm"]] as Pluggable[],
   },
 });
 
@@ -15,7 +14,7 @@ const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   experimental: {
     viewTransition: true,
-    mdxRs: true,
+    // mdxRs: true,
   },
   redirects: async () => [
     {

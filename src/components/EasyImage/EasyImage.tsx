@@ -15,7 +15,7 @@ export const EasyImage: FC<ImageConfig> = ({
         maxWidth: "100%",
         overflow: "hidden",
         position: "relative",
-        aspectRatio: aspectRatio,
+        aspectRatio: aspectRatio ? aspectRatio : "auto",
       }}
     >
       <NextImage
