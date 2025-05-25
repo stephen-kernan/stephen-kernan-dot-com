@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
       destination: "/blog/default-override-pattern",
       permanent: true,
     },
+    {
+      source: "/notes/one-sentence-anime-reviews",
+      destination: "/blog/one-sentence-anime-reviews",
+    }
   ],
 };
 

@@ -37,7 +37,6 @@ export const EasyImage: FC<ImageConfig> = ({
         fill
         alt="Me and my brother-in-law holding up Gamecube controllers"
         onLoad={() => {
-          console.log("Image loaded");
           setLoading(false);
         }}
       />
