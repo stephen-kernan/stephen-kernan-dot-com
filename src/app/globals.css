@@ -10,15 +10,18 @@
   --playerThree: hsl(53, 100%, 24%);
   --playerFour: hsl(184, 57%, 24%);
   --playerFive: #f0f8ff99;
-  --color-light: #fdfbf7;
+  --color-light: hsl(40, 60%, 98%);
   --color-light-dim: hsl(47, 29%, 94%);
+  --color-light-contrast: hsl(47, 29%, 84%);
   --color-dark: #0a0a0a;
   --color-dark-dim: #1a1a1a;
+  --color-dark-contrast: black;
 
   --background: var(--color-light);
   --foreground: var(--color-dark);
   --foreground-dim: var(--color-dark);
   --background-dim: var(--color-light-dim);
+  --background-contrast: var(--color-light-contrast);
 
   /* SIZE */
   --page-width: 95%;
@@ -39,6 +42,7 @@
   --foreground: var(--color-light);
   --foreground-dim: var(--color-light-dim);
   --background-dim: var(--color-dark-dim);
+  --background-contrast: var(--color-dark-contrast);
 
   --playerOne: hsl(216, 64%, 72%);
   --playerTwo: hsl(0, 64%, 72%);
@@ -219,9 +223,9 @@ h3 {
 
 ul,
 ol {
-  display: inline-block;
   padding-left: calc(2.5 * var(--intersection-spacing));
   margin-bottom: calc(1.25 * var(--intersection-spacing));
+  margin-top: calc(0.5 * var(--intersection-spacing));
 }
 
 li {
@@ -315,4 +319,24 @@ table {
 
 @view-transition {
   navigation: auto;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--background) 25%,
+    var(--background-dim) 50%,
+    var(--background) 75%
+  );
+  background-size: 200% 200%;
+  animation: shimmer 2.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

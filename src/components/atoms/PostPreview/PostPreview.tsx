@@ -28,8 +28,10 @@ export const PostPreview: FC<ContentMetadata> = ({
   date,
   url,
   excerpt,
+  tags,
 }) => {
   const formattedDate = formatDate(date);
+  const isNote = url.includes("/notes/");
 
   return (
     <div className={styles.previewSection}>
@@ -50,6 +52,7 @@ export const PostPreview: FC<ContentMetadata> = ({
           >
             {formattedDate}
           </p>
+          {isNote && <TagList tags={tags} />}
         </div>
         <div className={styles.buttonDesktop}>
           <Button href={url}>--{">"}</Button>

@@ -30,6 +30,10 @@ const components: MDXComponents = {
         </pre>
       );
     }
+
+    if (props.className?.includes("language-plaintext")) {
+      return <code>{children}</code>;
+    }
     const highlightedContent = highlight(children as string, {});
     return (
       <code

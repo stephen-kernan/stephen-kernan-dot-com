@@ -11,12 +11,6 @@
     font-weight: 600;
   }
   background-color: var(--background-dim);
-
-  &:hover {
-    .tag {
-      background-color: var(--background-dim);
-    }
-  }
 }
 
 .publishedDate {
@@ -40,12 +34,13 @@
 }
 
 .tagList {
+  margin-top: 0.75rem;
   display: flex;
   gap: 0.25rem;
 }
 
 .tag {
-  background-color: var(--background-dim);
+  background-color: var(--background-contrast);
   font-size: 0.875rem;
   border-radius: 4px;
   overflow: hidden;

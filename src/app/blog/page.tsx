@@ -9,7 +9,7 @@ export default async function BlogHome() {
         A collection of articles and essays I&apos;ve written. They are longer
         and more polished than notes.
       </p>
-      <PostList contentTypes={[ContentType.BlogProfessional]} />
+      <PostList contentTypes={[ContentType.Blog]} />
     </div>
   );
 }
