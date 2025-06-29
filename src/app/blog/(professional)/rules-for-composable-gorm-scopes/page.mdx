@@ -40,10 +40,11 @@ func OrderStatus(db *gorm.DB, status []string) func(db *gorm.DB) *gorm.DB {
     return db.Where("status in (?)", status)
   }
 }
+```
 
-// "Hey, I can use this scope on any table with a status column!
-// Let's refactor this to be more generic!"
+Many developers would look at this and think, "Hey, I can use this scope on any table that has a `status` column!"
 
+```go
 // Refactored to be more generic
 func StatusIn(status []string) func(db *gorm.DB) *gorm.DB {
   return func(db *gorm.DB) *gorm.DB {
@@ -52,15 +53,13 @@ func StatusIn(status []string) func(db *gorm.DB) *gorm.DB {
 }
 ```
 
-Many developers would look at this and think, "Hey, I can use this scope on any table that has a `status` column!"
-
 However, this can absolutely destroy the composability of your scopes. If you have a `User` table and an `Order` table and you want to join them together, you will end up with **an ambiguous column reference** because both tables have a `status` column.
 
 Instead, scopes should belong to one table and explicitly reference their table by name any time they reference a column. For example:
 
 ```go
 // Example of a scope that belongs to one table
-func OrderStatus(status []string) func(db *gorm.DB) *gorm.DB {
+func OrderStatusIn(status []string) func(db *gorm.DB) *gorm.DB {
   return func(db *gorm.DB) *gorm.DB {
     return db.Where("orders.status in (?)", status)
   }
@@ -132,14 +131,13 @@ func UserCreatedOrUpdatedAfter(time *time.Time) func(db *gorm.DB) *gorm.DB {
     return db.Where("users.created_at > ? OR users.updated_at > ?", time, time)
   }
 }
-
 ```
 
-The first scope, `UserProfileIsComplete`, checks for one idea: whether the user's profile is complete. It does this by checking multiple conditions related to the user's profile fields. This is perfectly fine because the conditions add to a single idea of profile completeness.
+**`UserProfileIsComplete` checks for one idea:** whether the user's profile is complete. It does this by checking multiple conditions related to the user's profile fields. This is perfectly fine because the conditions add to a single idea of profile completeness.
 
-The second scope, `UserCreatedOrUpdatedAfter`, checks for two different ideas: whether the user was created after a certain time or updated after a certain time. This is problematic because it mixes two different concepts into one scope.
+**`UserCreatedOrUpdatedAfter` checks for two different ideas:** whether the user was created after a certain time or updated after a certain time. This is problematic because it mixes two different concepts into one scope.
 
-Because it's filtering on two different ideas (created and updated), this scope is less reusable. As a result, it's likely that we'd need to build separate scopes for the individual conditions anyway, leading to an exposion of hyper-specific scopes.
+Because it's filtering on two different ideas (created and updated), this scope is less reusable. As a result, it's likely that we'd need to build separate scopes for the individual conditions anyway, leading to an explosion of hyper-specific scopes.
 
 Instead, if we split this into two separate scopes, then those scopes will be much more composable while still giving us the flexibility to combine them later if needed:
 
