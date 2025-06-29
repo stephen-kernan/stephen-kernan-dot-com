@@ -22,6 +22,12 @@ const components: MDXComponents = {
   img: ({ ...props }: ComponentPropsWithoutRef<"img">) => {
     return <EasyImage url={props.src as string} />;
   },
+  input: ({ ...props }: ComponentPropsWithoutRef<"input">) => {
+    if (props.disabled) {
+      return <input {...{ ...props, disabled: false }} />;
+    }
+    return <input {...props} />;
+  },
   code: ({ children, ...props }: ComponentPropsWithoutRef<"code">) => {
     if (props.className?.includes("language-mermaid")) {
       return (

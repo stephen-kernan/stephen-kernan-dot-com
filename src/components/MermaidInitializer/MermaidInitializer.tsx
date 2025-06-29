@@ -19,9 +19,10 @@ const buildTheme = (theme: Theme) => {
       background: "#1e1e2f",
       primaryTextColor: "#0a0a0a",
       primaryColor: "hsl(47, 29%, 94%)",
+      secondaryColor: "hsl(41, 87%, 72%)",
       titleColor: "hsl(47, 29%, 94%)",
       textColor: "hsl(47, 29%, 94%)",
-      secondaryColor: "hsl(41, 87%, 72%)",
+      actorLineColor: "hsl(47, 29%, 94%)",
     };
   }
   return themeVars;

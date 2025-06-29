@@ -1,0 +1,291 @@
+export const metadata = {
+  title: "Rules for composable GORM scopes",
+  excerpt: "How to use GORM scopes without creating a tangled mess.",
+  date: "2025-06-29",
+  tags: ["gorm", "go", "database", "scopes"],
+  slug: "rules-for-gorm-scopes",
+};
+
+import { Byline } from "@/components/atoms/Byline/Byline";
+
+# Rules for composable GORM scopes
+
+<Byline {...metadata} />
+
+[Scopes](https://gorm.io/docs/scopes.html) can be a powerful feature for reusing common logic across a large GORM codebase, but they can also explode into a tangled mess if not used carefully. Here are some rules to follow to keep your scopes clean and manageable.
+
+## Composable scopes checklist
+
+For folks who are looking for a quick checklist to follow when writing and reviewing GORM scopes, here are the rules we will cover in this post. You can click on each rule to jump to the section that explains it in detail:
+
+- [ ] [Scopes belong to one table and explicitly reference their table](#scopes-belong-to-one-table-and-reference-it-by-name)
+- [ ] [Scopes do not mix clauses](#scopes-do-not-mix-clauses)
+- [ ] [Scopes only check for one "idea"](#scopes-only-check-for-one-idea)
+- [ ] [Scopes do not load related models](#scopes-do-not-load-related-models)
+- [ ] [Scopes handle the `nil` case gracefully](#scopes-handle-nil-case-gracefully)
+- [ ] [Scopes' names begin with their table name](#scope-names-begin-with-the-name-of-their-table)
+
+<span id="scopes-belong-to-one-table-and-reference-it-by-name" />
+
+## Scopes belong to one table and reference it by name
+
+One of the effects of using GORM scopes is that there can be a lot of them. As a result, it can be tempting to create generic scopes that can be used across multiple tables.
+
+Take, for example, this `OrderStatus` scope from the GORM documentation:
+
+```go
+// Example from the GORM documentation
+func OrderStatus(db *gorm.DB, status []string) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("status in (?)", status)
+  }
+}
+
+// "Hey, I can use this scope on any table with a status column!
+// Let's refactor this to be more generic!"
+
+// Refactored to be more generic
+func StatusIn(status []string) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("status in (?)", status)
+  }
+}
+```
+
+Many developers would look at this and think, "Hey, I can use this scope on any table that has a `status` column!"
+
+However, this can absolutely destroy the composability of your scopes. If you have a `User` table and an `Order` table and you want to join them together, you will end up with **an ambiguous column reference** because both tables have a `status` column.
+
+Instead, scopes should belong to one table and explicitly reference their table by name any time they reference a column. For example:
+
+```go
+// Example of a scope that belongs to one table
+func OrderStatus(status []string) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("orders.status in (?)", status)
+  }
+}
+```
+
+This ensures two things:
+
+1. `JOIN` statements will always be unambiguous.
+2. The scope will throw an error if you try to use it while querying a different table.
+
+<span id="scopes-do-not-mix-clauses" />
+## Scopes do not mix clauses
+
+Scopes should not mix different types of clauses (e.g., `WHERE`, `JOIN`, etc.). Mixing clauses can lead to bugs that are a nightmare to track down.
+
+For example, consider the following two scopes that mix a `WHERE` clause with an `ORDER BY` clause:
+
+```go
+// Example of a scope that mixes clauses
+func UserWithBirthdateInMonth(month int) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("extract(month from users.birthdate) = ?", month).
+      Order("birthdate")
+  }
+}
+```
+
+This scope is problematic because it takes away the caller's flexibility to add their own `ORDER BY` clause. If the caller wants to order by something else, this scope will become unusable.
+
+Instead, scopes should only contain one type of clause. For example, you could split the above scope into two separate scopes:
+
+```go
+// Example of scopes that do not mix clauses
+func UserWithBirthdateInMonth(month int) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("extract(month from users.birthdate) = ?", month)
+  }
+}
+
+func UserOrderByBirthdate() func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Order("birthdate")
+  }
+}
+```
+
+<span id="scopes-only-check-for-one-idea" />
+## Scopes only check for one "idea"
+
+Scopes should only check for one "idea" at a time. This helps keep scopes focused and keeps the number of scopes to a minimum.
+
+For example, let's take a look at two different scopes which have multiple conditions:
+
+```go
+// Example of a scope that checks for one idea with multiple conditions
+func UserProfileIsComplete() func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.email is not null and users.email <> ''")
+      .Where("users.first_name is not null and users.first_name <> ''")
+      .Where("users.last_name is not null and users.last_name <> ''")
+      .Where("users.birthdate is not null")
+  }
+}
+
+// Example of a scope that checks for multiple ideas.
+func UserCreatedOrUpdatedAfter(time *time.Time) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.created_at > ? OR users.updated_at > ?", time, time)
+  }
+}
+
+```
+
+The first scope, `UserProfileIsComplete`, checks for one idea: whether the user's profile is complete. It does this by checking multiple conditions related to the user's profile fields. This is perfectly fine because the conditions add to a single idea of profile completeness.
+
+The second scope, `UserCreatedOrUpdatedAfter`, checks for two different ideas: whether the user was created after a certain time or updated after a certain time. This is problematic because it mixes two different concepts into one scope.
+
+Because it's filtering on two different ideas (created and updated), this scope is less reusable. As a result, it's likely that we'd need to build separate scopes for the individual conditions anyway, leading to an exposion of hyper-specific scopes.
+
+Instead, if we split this into two separate scopes, then those scopes will be much more composable while still giving us the flexibility to combine them later if needed:
+
+```go
+func UserCreatedAfter(time *time.Time) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.created_at > ?", time)
+  }
+}
+
+func UserUpdatedAfter(time *time.Time) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.updated_at > ?", time)
+  }
+}
+
+// Usage example
+db.Where(
+  db.Scopes(UserCreatedAfter(someTime))
+).Or(
+  db.Scopes(UserUpdatedAfter(someTime))
+)
+```
+
+<span id="scopes-do-not-load-related-models" />
+## Scopes do not load related models when filtering
+
+Scopes should not load related models (e.g., `Preload`, `Joins`, etc.). This is for two reasons:
+
+1. **Performance**: Loading related models can lead to performance issues, especially if the related models are large or if there are many relationships.
+2. **Composability**: Loading related models can make scopes less composable by removing the caller's ability to control how related models are loaded.
+
+For example, consider the following scope that preloads a related model:
+
+```go
+// Example of a scope that loads related models
+func UserIsActive() func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.active").Preload("Posts")
+  }
+}
+```
+
+This scope is problematic because it loads the `Posts` relationship every time the filter is applied, which causes an additional database query for data that may not be needed by the caller.
+
+Instead, scopes should only filter the main model and leave related model loading to the caller. For example:
+
+```go
+// Example of a scope that does not load related models
+func UserIsActive() func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.active")
+  }
+}
+
+// Usage example
+db.Scopes(UserIsActive()).Preload("Posts")
+```
+
+This way, we reduce unnecessary database queries and give the caller the flexibility to load related models as needed.
+
+<span id="scopes-handle-nil-case-gracefully" />
+## Scopes handle the `nil` case gracefully
+
+Scopes should handle their own `nil` cases. If a scope is called with a `nil` receiver, it should return the original query without modifying it. This prevents panics and keeps the code clean in the event of optional parameters.
+
+For example, consider the following scope that does not handle the `nil` case:
+
+```go
+// Example of a scope that does not handle nil case
+func UserEmailStartsWith(prefix string) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.email LIKE ?", prefix+"%")
+  }
+}
+
+func UserIsActive(isActive bool) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    return db.Where("users.active = ?", isActive)
+  }
+}
+
+type ListUsersOptions struct {
+  Email *string
+  IsActive *bool
+  ... // other options
+}
+
+// Usage example
+func ListUsers(db *gorm.DB, opts *ListUsersOptions) []User {
+  query := db.Model(&User{})
+  
+  if opts == nil {
+    return query.Find(&[]User{}).Rows()
+  }
+
+  if opts.Email != nil {
+    query = query.Scopes(UserEmailStartsWith(*opts.Email))
+  }
+
+  if opts.IsActive != nil {
+    query = query.Scopes(UserIsActive(*opts.IsActive))
+  }
+
+  return query.Find(&[]User{}).Rows()
+}
+```
+
+Because the `UserEmailStartsWith` scope does not handle the `nil` case, every caller has to add `if` statements throughout their code to account for that fact. This can lead to a lot of boilerplate code and makes the code harder to read.
+
+Instead, scopes should accept pointers and handle the `nil` case gracefully. For example:
+
+```go
+// Example of a scope that handles nil case gracefully
+func UserEmailStartsWith(prefix *string) func(db *gorm.DB) *gorm.DB {
+  return func(db *gorm.DB) *gorm.DB {
+    if prefix == nil {
+      return db // Return the original query if prefix is nil
+    }
+    return db.Where("users.email LIKE ?", *prefix+"%")
+  }
+}
+
+// Usage example
+func ListUsers(db *gorm.DB, opts *ListUsersOptions) []User {
+  if opts == nil {
+    return db.Model(&User{}).Find(&[]User{}).Rows()
+  }
+
+  return db.Model(&User{}).Scopes(
+    UserEmailStartsWith(opts.Email),
+    UserIsActive(opts.IsActive)
+  )
+}
+```
+
+Look at how much cleaner the `ListUsers` function is now!
+
+Because the scopes now accept pointers, they can handle their own validation, allowing the caller to safely pass its parameters without worrying about `nil` checks.
+
+This way, the scope is responsible for ensuring it applies the filter correctly while the caller can focus on building the query. Furthermore, because the logic lives in one place, we can write unit tests for the scopes to ensure they behave correctly in all cases.
+
+<span id="scope-names-begin-with-the-name-of-their-table" />
+## Scope names begin with the name of their table
+
+Finally, scope names should begin with the name of their table. This is purely a developer experience improvement, but it has a few benefits:
+
+- It makes it much easier to find scopes using autocomplete in your IDE.
+- It makes scopes much easier to read and understand when looking at a query.

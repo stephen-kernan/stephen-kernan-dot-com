@@ -26,6 +26,13 @@
   /* SIZE */
   --page-width: 95%;
 
+  --m-document-bg: var(--background-dim);
+  --m-title-color: var(--foreground);
+  --m-node-color: white;
+  --m-node-text-color: var(--foreground);
+  --m-edge-label-color: gold;
+  --m-line-color: var(--foreground-dim);
+
   --sh-identifier: var(--foreground-dim);
   --sh-keyword: var(--playerTwo);
   --sh-string: var(--playerThree);
@@ -49,6 +56,10 @@
   --playerThree: hsl(41, 87%, 72%);
   --playerFour: hsl(184, 57%, 72%);
 
+  --m-edge-label-color: var(--playerThree);
+  --m-node-text-color: var(--background);
+  --m-node-color: var(--foreground-dim);
+
   .navbar {
     button:hover {
       svg {
@@ -63,6 +74,77 @@
     font-weight: 600;
   }
 }
+
+.mermaid {
+  /* Document container styles */
+  svg[role~="graphics-document"] {
+    background-color: var(--m-document-bg) !important;
+  }
+
+  /* Title styles */
+  [class$="TitleText"] {
+    fill: var(--m-title-color) !important;
+  }
+
+  /* Node container styles */
+  .label-container,
+  .node path {
+    fill: var(--m-node-color) !important;
+    stroke: var(--m-node-text-color) !important;
+  }
+
+  /* Node text styles */
+  .nodeLabel p {
+    color: var(--m-node-text-color) !important;
+  }
+
+  /* Edge label styles */
+  foreignObject .edgeLabel > p {
+    background-color: var(--m-edge-label-color) !important;
+  }
+
+  /* Arrow point styles */
+  .marker,
+  marker path {
+    fill: var(--m-line-color) !important;
+    stroke: var(--m-line-color) !important;
+  }
+
+  /* Edge path text styles */
+  .messageText {
+    fill: var(--m-line-color) !important;
+  }
+
+  /* Edge path line styles */
+  .edgePaths path,
+  [class^="messageLine"],
+  .actor-line {
+    stroke: var(--m-line-color) !important;
+  }
+
+  /* SEQUENCE DIAGRAMS */
+
+  /* Actor styles */
+  .actor {
+    fill: var(--m-node-color) !important;
+    stroke: var(--m-node-text-color) !important;
+
+    /* Text styles */
+    tspan {
+      fill: var(--m-node-text-color) !important;
+    }
+  }
+}
+
+input {
+  cursor: pointer;
+}
+
+ul li:has(input[type="checkbox"]) {
+  list-style: none;
+  margin-left: calc(-1.25 * var(--intersection-spacing));
+}
+
 code {
   font-family: var(--font-jb-mono), monospace;
 }

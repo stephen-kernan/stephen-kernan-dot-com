@@ -30,7 +30,8 @@ const nextConfig: NextConfig = {
     {
       source: "/notes/one-sentence-anime-reviews",
       destination: "/blog/one-sentence-anime-reviews",
-    }
+      permanent: true,
+    },
   ],
 };
 
